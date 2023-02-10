@@ -1,0 +1,4 @@
+### Local
+GET http://localhost:8080/hello?name=angela
+Accept: text/plain
+Cookie: user=withbeth
