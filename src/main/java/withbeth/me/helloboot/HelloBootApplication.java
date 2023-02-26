@@ -24,29 +24,32 @@ public class HelloBootApplication {
     public static void main(String[] args) {
         // SpringApplication.run(HelloBootApplication.class, args);
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-        WebServer webServer = serverFactory.getWebServer(servletContext ->
-                servletContext.addServlet("myFrontController", new HttpServlet() {
-                    @Override
-                    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                        // Servlet 공통 로직 구현 skip;
 
-                        // handler mapping
-                        if (req.getMethod().equals(HttpMethod.GET.name())
-                                && req.getRequestURI().equals("/hello")) {
-                            // Handle Request
-                            // handle "name" param
-                            String name = req.getParameter("name");
+        WebServer webServer = serverFactory.getWebServer(servletContext -> {
 
-                            // Handle Response
-                            resp.setStatus(HttpStatus.OK.value());
-                            resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-                            // 간단히 body 부분 설정
-                            resp.getWriter().println("hello " + name + " from servlet");
-                        } else {
-                            resp.setStatus(HttpStatus.NOT_FOUND.value());
-                        }
+            HelloController helloController = new HelloController();
+
+            servletContext.addServlet("myFrontController", new HttpServlet() {
+                @Override
+                protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                    // Servlet 공통 로직 구현 skip;
+
+                    // handler mapping
+                    if (req.getMethod().equals(HttpMethod.GET.name())
+                            && req.getRequestURI().equals("/hello")) {
+
+                        // binding
+                        String ret = helloController.hello(req.getParameter("name"));
+
+                        resp.setStatus(HttpStatus.OK.value());
+                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+                        resp.getWriter().println(ret);
+                    } else {
+                        resp.setStatus(HttpStatus.NOT_FOUND.value());
                     }
-                }).addMapping("/*")); // 모든 요청은 front controller로 위임
+                }
+            }).addMapping("/*"); // 모든 요청은 front controller로 위임
+        });
         webServer.start();
     }
 
