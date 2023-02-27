@@ -6,6 +6,7 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,16 @@ public class HelloBootApplication {
         // SpringApplication.run(HelloBootApplication.class, args);
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 
-        WebServer webServer = serverFactory.getWebServer(servletContext -> {
+        // Spring Container 생성
+        GenericApplicationContext appContext = new GenericApplicationContext();
+        // Bean class 지정
+        appContext.registerBean(HelloController.class);
+        // 주어진 구성정보 이용해 초기화
+        appContext.refresh();
+        // 클래스 타입만으로 빈 취득
+        HelloController helloController = appContext.getBean(HelloController.class);
 
-            HelloController helloController = new HelloController();
+        WebServer webServer = serverFactory.getWebServer(servletContext -> {
 
             servletContext.addServlet("myFrontController", new HttpServlet() {
                 @Override
