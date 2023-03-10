@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.support.GenericWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -27,7 +29,8 @@ public class HelloBootApplication {
         ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 
         // Spring Container 생성
-        GenericApplicationContext appContext = new GenericApplicationContext();
+        // DispatcherServlet은 WebAppContext를 인자로 받기에, GenericWebAppContext생성.
+        GenericWebApplicationContext appContext = new GenericWebApplicationContext();
         // Bean class 지정
         appContext.registerBean(HelloController.class);
         // 스프링이 구성정보를 만들때는, 정확하게 어떤 클래스를 가지고 빈을 만들건지 명시적으로 지정해야 한다.
@@ -39,26 +42,8 @@ public class HelloBootApplication {
 
         WebServer webServer = serverFactory.getWebServer(servletContext -> {
 
-            servletContext.addServlet("myFrontController", new HttpServlet() {
-                @Override
-                protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-                    // Servlet 공통 로직 구현 skip;
-
-                    // handler mapping
-                    if (req.getMethod().equals(HttpMethod.GET.name())
-                            && req.getRequestURI().equals("/hello")) {
-
-                        // binding
-                        String ret = helloController.hello(req.getParameter("name"));
-
-                        resp.setStatus(HttpStatus.OK.value());
-                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
-                        resp.getWriter().println(ret);
-                    } else {
-                        resp.setStatus(HttpStatus.NOT_FOUND.value());
-                    }
-                }
-            }).addMapping("/*"); // 모든 요청은 front controller로 위임
+            servletContext.addServlet("dispatcherServlet", new DispatcherServlet(appContext))
+                    .addMapping("/*"); // 모든 요청은 front controller로 위임
         });
         webServer.start();
     }
