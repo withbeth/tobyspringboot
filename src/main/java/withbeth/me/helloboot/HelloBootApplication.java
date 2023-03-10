@@ -26,11 +26,27 @@ public class HelloBootApplication {
 
     public static void main(String[] args) {
         // SpringApplication.run(HelloBootApplication.class, args);
-        ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 
         // Spring Container 생성
         // DispatcherServlet은 WebAppContext를 인자로 받기에, GenericWebAppContext생성.
-        GenericWebApplicationContext appContext = new GenericWebApplicationContext();
+        GenericWebApplicationContext appContext = new GenericWebApplicationContext() {
+
+            @Override
+            protected void onRefresh() {
+                super.onRefresh();
+
+                // 스프링 컨테이너 생성중에 서블릿 컨테이너 생성 및 프론트 컨트롤러 등록
+                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+
+                WebServer webServer = serverFactory.getWebServer(servletContext -> {
+                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this))
+                            .addMapping("/*"); // 모든 요청은 front controller로 위임
+                });
+
+                webServer.start();
+
+            }
+        };
         // Bean class 지정
         appContext.registerBean(HelloController.class);
         // 스프링이 구성정보를 만들때는, 정확하게 어떤 클래스를 가지고 빈을 만들건지 명시적으로 지정해야 한다.
@@ -39,13 +55,6 @@ public class HelloBootApplication {
         appContext.refresh();
         // 클래스 타입만으로 빈 취득
         HelloController helloController = appContext.getBean(HelloController.class);
-
-        WebServer webServer = serverFactory.getWebServer(servletContext -> {
-
-            servletContext.addServlet("dispatcherServlet", new DispatcherServlet(appContext))
-                    .addMapping("/*"); // 모든 요청은 front controller로 위임
-        });
-        webServer.start();
     }
 
 }
