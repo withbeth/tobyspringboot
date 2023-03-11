@@ -3,6 +3,7 @@ package withbeth.me.helloboot;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -12,6 +13,16 @@ import org.springframework.web.servlet.DispatcherServlet;
 @Configuration
 @ComponentScan
 public class HelloBootApplication {
+
+    @Bean
+    ServletWebServerFactory servletWebServerFactory() {
+        return new TomcatServletWebServerFactory();
+    }
+
+    @Bean
+    DispatcherServlet dispatcherServlet() {
+        return new DispatcherServlet();
+    }
 
     public static void main(String[] args) {
         // SpringApplication.run(HelloBootApplication.class, args);
@@ -24,11 +35,12 @@ public class HelloBootApplication {
             protected void onRefresh() {
                 super.onRefresh();
 
+
                 // 스프링 컨테이너 생성중에 서블릿 컨테이너 생성 및 프론트 컨트롤러 등록
-                ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+                ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
 
                 WebServer webServer = serverFactory.getWebServer(servletContext -> {
-                    servletContext.addServlet("dispatcherServlet", new DispatcherServlet(this))
+                    servletContext.addServlet("dispatcherServlet", this.getBean(DispatcherServlet.class))
                             .addMapping("/*"); // 모든 요청은 front controller로 위임
                 });
 
