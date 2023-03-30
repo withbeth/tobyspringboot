@@ -1,6 +1,5 @@
 package withbeth.me.helloboot;
 
-import java.util.Objects;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +14,9 @@ public class HelloController {
 
     @GetMapping("/hello")
     public String hello(String name) {
-        Objects.requireNonNull(name);
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("name cannot be null or empty");
+        }
         return helloService.sayHello(name);
     }
 }

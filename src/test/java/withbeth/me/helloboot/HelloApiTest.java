@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 class HelloApiTest {
 
     @Test
-    void helloApi() {
+    void ok() {
         // 이전장까지 수동으로 검증했던 방법을 자동화.
         // Request : http -v :8080/hello?name=withbeth
         // Response :
@@ -31,5 +31,14 @@ class HelloApiTest {
         assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).startsWith(MediaType.TEXT_PLAIN_VALUE);
         assertThat(response.getBody()).isEqualTo("Hello, withbeth");
     }
+
+    @Test
+    void fail() {
+        TestRestTemplate restTemplate = new TestRestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(
+            "http://localhost:8080/hello?name", String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 }
