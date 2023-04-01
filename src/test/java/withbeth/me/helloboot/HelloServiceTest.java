@@ -12,4 +12,10 @@ class HelloServiceTest {
          assertThat(helloService.sayHello("withbeth")).isEqualTo("Hello, withbeth");
     }
 
+    @Test
+    void helloDecorator() {
+        HelloService helloService = new HelloDecorator(name -> name);
+        assertThat(helloService.sayHello("withbeth")).isEqualTo("*withbeth*");
+    }
+
 }

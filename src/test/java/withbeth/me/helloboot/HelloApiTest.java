@@ -29,7 +29,7 @@ class HelloApiTest {
         // TODO : 아마 다음장에서 default charset을 UTF-8로 바꾸고 다시 테스트
         //assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.TEXT_PLAIN);
         assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE)).startsWith(MediaType.TEXT_PLAIN_VALUE);
-        assertThat(response.getBody()).isEqualTo("Hello, withbeth");
+        assertThat(response.getBody()).isEqualTo("*Hello, withbeth*");
     }
 
     @Test

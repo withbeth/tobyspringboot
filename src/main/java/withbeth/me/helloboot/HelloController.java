@@ -8,7 +8,7 @@ public class HelloController {
 
     private final HelloService helloService;
 
-    public HelloController(HelloService helloService) {
+    public HelloController(@Decorated HelloService helloService) {
         this.helloService = helloService;
     }
 
