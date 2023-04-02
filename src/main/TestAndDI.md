@@ -2,7 +2,7 @@
 
 - [x] 테스트코드를 이용한 간단한 API 기능 테스트 
 - [x] DI와 단위 테스트 (생성자 주입을 이용했기에, 수동DI로 고립테스트가 가능하며)
-- [ ] DI를 이용한 Decorator, Proxy 패턴
+- [x] DI를 이용한 Decorator, Proxy 패턴
 
 ### What did you learn?
 
