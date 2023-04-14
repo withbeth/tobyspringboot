@@ -1,21 +1,22 @@
 # 자동구성기반 애플리케이션 
 
 ### Goal
-SpringBoot의 AutoConfiguration이, 어떻게 구성되어있고, 어떻게 작동하는지에 대한 이해
+
+SpringBoot의 `@AutoConfiguration`이, 어떻게 구성되어있고, 어떻게 작동하는지에 대한 이해
 
 ### TOC
 
 [x] 들어가며
 
 - 자동구성이 뭐 대단한 것은 아니고, 기존 스프링에 있는 기술을 적절히 조합 및 활용하여 제공해주고 있는 것뿐이다.
-- 다만, 자동구성을 이해하기 위해서는 스프링부트가 어노테이션을 활용할때 사용하는 기법을 잘 이해하여 응용이 필요하다.
+- 다만, 자동구성을 이해하기 위해서는 `스프링부트가 어노테이션을 활용할때 사용하는 기법`을 잘 이해하여 응용이 필요하다.
 
 [x] Meta-Annotation and Composed-Annotation
 
 - Goal : 메타어노테이션과 합성어노테이션의 설명
 
 - Q.Meta-Annotation?
-  - @Controller, @Service와 같은 스테레오 타입 어노테이션들은, @Component을 자신의 어노테이션으로 다시 부여하여 @Component과 동일한 효과를 내도록 만들었다.
+  - @Controller, @Service와 같은 스테레오 타입 어노테이션들은, `@Component을 자신의 어노테이션으로 다시 부여`하여 @Component과 동일한 효과를 내도록 만들었다.
   - 즉, @Component를 메타어노테이션으로서 갖음으로써 해당 어노테이션이 적용된 효과를 내도록 하고 있는것.
 
 - Q.Meta-Annotation 활용시 이점이 있을까?
@@ -27,7 +28,7 @@ SpringBoot의 AutoConfiguration이, 어떻게 구성되어있고, 어떻게 작�
 
 - Q. Meta-Annotation은 상속과 다른 개념이다?
   - 당연히 어노테이션 자체에 상속이라는 개념은 존재하지 않는다.
-  - @Target이 AnnotationType으로 명시되어있을 경우만, 메타어노테이션으로 활용 가능.
+  - @Target이 ANNOTATION_TYPE으로 명시되어있을 경우만, 메타어노테이션으로 활용 가능.
 
 - HandsOn. JUnit5에 @UnitTest라는 어노테이션 만들어보기
   ```java
@@ -45,6 +46,36 @@ SpringBoot의 AutoConfiguration이, 어떻게 구성되어있고, 어떻게 작�
 [ ] Composed Annotation 적용
 
 - Goal : 지금까지 작성한 코드에 메타어노테이션과 합성어노테이션을 이용하면 코드가 얼마나 간결해질수 있는지 확인
+
+- `@SpringBootApplication`을 적용하지 않은 `HelloBootApplication`은 다음과 같이 구현되어 있다.
+  ```java
+  @Configuration
+  @ComponentScan
+  public class HelloBootApplication {
+
+    @Bean
+    ServletWebServerFactory servletWebServerFactory() {
+      return new TomcatServletWebServerFactory();
+    }
+
+    @Bean
+    DispatcherServlet dispatcherServlet() {
+      return new DispatcherServlet();
+    }
+
+    public static void main(String[] args) {
+      SpringApplication.run(HelloBootApplication.class, args);
+    }
+  }
+  ```
+
+- 하고싶은것 : `@SpringBootApplication`을 이용해서 메인엔트리 작동시킬 때처럼, main메서드 이외의 정보는 별도로 분리하고 싶다.
+  
+- Action 1 : `@Configuration`과 `@ComponentScan`을 Composed Annoation으로 합치기 (`@MySpringBootApplication`)
+ 
+- Action 2 : `ServletWebServerFactory`와 `DispatcherServlet` Bean 등록 하는 Config을 별도클래스로  분리(`Config`)
+
+- 아직 해결하지 못한 것 : 단순히 어노테이션과 설정정보를 별도 분리한 것뿐이라, 유연하고 편리하게 다양한 기술을 적용할수 있도록, `@AutoConfiguration`구조로 확장해보기
 
 [ ] Bean Object의 역할과 구분
 
