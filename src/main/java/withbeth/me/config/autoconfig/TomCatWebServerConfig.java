@@ -1,22 +1,14 @@
-package withbeth.me.helloboot;
+package withbeth.me.config.autoconfig;
 
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
-public class Config {
-
+public class TomCatWebServerConfig {
     @Bean
     ServletWebServerFactory servletWebServerFactory() {
         return new TomcatServletWebServerFactory();
     }
-
-    @Bean
-    DispatcherServlet dispatcherServlet() {
-        return new DispatcherServlet();
-    }
-
 }

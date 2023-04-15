@@ -1,4 +1,4 @@
-package withbeth.me.helloboot;
+package withbeth.me.config;
 
 
 import java.lang.annotation.ElementType;
@@ -12,5 +12,6 @@ import org.springframework.context.annotation.Configuration;
 @Target(ElementType.TYPE)
 @Configuration
 @ComponentScan
+@EnableMyAutoConfiguration
 public @interface MySpringBootApplication {
 }

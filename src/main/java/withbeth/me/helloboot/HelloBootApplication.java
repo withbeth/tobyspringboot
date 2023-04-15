@@ -1,6 +1,7 @@
 package withbeth.me.helloboot;
 
 import org.springframework.boot.SpringApplication;
+import withbeth.me.config.MySpringBootApplication;
 
 // @SpringBootApplication
 @MySpringBootApplication

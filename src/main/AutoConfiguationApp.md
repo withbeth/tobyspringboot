@@ -115,15 +115,14 @@ Simply put,
 - Application에서 사용될수 있는 각 인프라 빈들을 담은 `@Configuration` class들을 `각 기능별`로 구분하여 작성.
 - SpringBoot가 Application의 필요에 따라, 필요한 설정정보들을 골라 필요한 방식으로 구성하여 자동으로 적용.
 
-### [ ] 인프라 빈 구성정보 분리
+### [x] 인프라 빈 구성정보 분리
 
 What we want to do :
 - `ServletWebServerFactory`, `DispatcherServlet` bean을, **Application Infra Bean**으로 등록하고 싶다.
 - 따라서, 단순 @ComponentScan이 아닌, @AutoConfiguration 이용해 `자동 구성정보` 만들기.
 
-Task :
-- [] @ComponentScan의 basepackage대상으로부터 제외하기(다른 패키지로 이동)
-- 
+What we did :
+![IMG_DE93CF4A3042-1.jpeg](..%2F..%2Fimage%2FIMG_DE93CF4A3042-1.jpeg)
 
 ### [ ] 동적인 자동구성정보 등록
 
