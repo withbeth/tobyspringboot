@@ -5,7 +5,7 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-public class MySpringApplication {
+public class MyHelloBootApplication {
     public static void run(Class<?> applicationClass, String[] args) {
         // SpringApplication.run(HelloBootApplication.class, args);
 

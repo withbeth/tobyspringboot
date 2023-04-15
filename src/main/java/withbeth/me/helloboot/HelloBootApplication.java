@@ -3,7 +3,7 @@ package withbeth.me.helloboot;
 import org.springframework.boot.SpringApplication;
 
 // @SpringBootApplication
-@MySpringBootAnnotation
+@MySpringBootApplication
 public class HelloBootApplication {
 
     public static void main(String[] args) {

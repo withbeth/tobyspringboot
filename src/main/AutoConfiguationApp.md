@@ -74,16 +74,14 @@ public class HelloBootApplication {
 }
 ```
 
-하고싶은것 : 
+What we want to do: 
 - `@SpringBootApplication`을 이용해서 메인엔트리 작동시킬 때처럼, main메서드 이외의 정보는 별도로 분리하고 싶다.
   
-Action 1 : 
-- `@Configuration`과 `@ComponentScan`을 Composed Annoation으로 합치기 (`@MySpringBootApplication`)
- 
-Action 2 : 
-- `ServletWebServerFactory`와 `DispatcherServlet` Bean 등록 하는 Config을 별도클래스로  분리(`Config`)
+Task : 
+- [x] `@Configuration`과 `@ComponentScan`을 Composed Annoation으로 합치기 (`@MySpringBootApplication`)
+- [x] `ServletWebServerFactory`와 `DispatcherServlet` Bean 등록 하는 Config을 별도클래스로  분리(`Config`)
 
-아직 해결하지 못한 것 : 
+Remaining Task :
 - 단순히 어노테이션과 설정정보를 별도 분리한 것뿐이라, 유연하고 편리하게 다양한 기술을 적용할수 있도록, `@AutoConfiguration`구조로 확장해보기
 
 ### [x] Bean Object의 역할과 구분
@@ -100,7 +98,7 @@ Q. 스프링 컨테이너에 등록되는 빈들은, 어떤 종류로 구분할�
   - 개발자가 어떤 빈을 사용할지 `명시적으로 구성정보를 제공`한 빈.
   - **Application Logic bean**과, **Application Infra bean**으로 구분할수 있다.
   - **Application Logic Bean**의 구성 정보는, 사용자가 명시적으로  `ComponenScan`으로 구성정보 제공.
-  - **Application Infra Bean**의 구성 정보는 `AutoConfiguration`을 이용해 자동으로 구성정보 제공.
+  - **Application Infra Bean**의 구성 정보는 `AutoConfiguration`을 이용해 **자동**으로 구성정보 제공.
 
 - **Container Infra bean** :
   - `ApplicationContext`, `BeanFactoryPostProcessor`,`BeanPostProcessor`, `DefaultAdvisorAutoProxyCreator`,...
@@ -108,7 +106,7 @@ Q. 스프링 컨테이너에 등록되는 빈들은, 어떤 종류로 구분할�
 
 Q. 스프링부트가 container-less 달성을 위해, 내장형 서블릿 컨테이너를 이용하는 standalone방식으로 동작시키기 위해 이용하는 다음과 같은 빈들이 존재하는데, 이 빈들은 어떤 빈에 속하는 것일까?
 - `ServletWebServerFactory` bean
-- `DispatcherServelt` bean 
+- `DispatcherServlet` bean 
 - A. 명시적으로 구성 정보를 제공해야 하므로, **Appliction Infra Bean**.
 - A. **Appliction Infra Bean**이기에, `자동 구성정보(AutoConfiguration)`를 이용해 구성 정보가 만들어진다.
 
@@ -118,6 +116,14 @@ Simply put,
 - SpringBoot가 Application의 필요에 따라, 필요한 설정정보들을 골라 필요한 방식으로 구성하여 자동으로 적용.
 
 ### [ ] 인프라 빈 구성정보 분리
+
+What we want to do :
+- `ServletWebServerFactory`, `DispatcherServlet` bean을, **Application Infra Bean**으로 등록하고 싶다.
+- 따라서, 단순 @ComponentScan이 아닌, @AutoConfiguration 이용해 `자동 구성정보` 만들기.
+
+Task :
+- [] @ComponentScan의 basepackage대상으로부터 제외하기(다른 패키지로 이동)
+- 
 
 ### [ ] 동적인 자동구성정보 등록
 
@@ -130,6 +136,3 @@ Simply put,
 ### Note
 
 
-
-### QnA
-- Q. 스프링에서는 어노테이션을 어떻게 활용하고 있나?
