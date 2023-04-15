@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class TomCatWebServerConfig {
+public class TomcatWebServerConfig {
     @Bean
     ServletWebServerFactory servletWebServerFactory() {
         return new TomcatServletWebServerFactory();

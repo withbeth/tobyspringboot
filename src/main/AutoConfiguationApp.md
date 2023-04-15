@@ -124,7 +124,41 @@ What we want to do :
 What we did :
 ![IMG_DE93CF4A3042-1.jpeg](..%2F..%2Fimage%2FIMG_DE93CF4A3042-1.jpeg)
 
-### [ ] 동적인 자동구성정보 등록
+### [x] 동적인 자동구성정보 등록
+
+What we want to do :
+- 위에서 별도 어노테이션으로 분리한 **Application Infra Bean**을, `동적`으로 등록 하고 싶다.
+
+AS-IS :
+- 해당빈들을 @Import를 이용해 hardcoded & static하게 등록하고 있다.
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Import({DispatcherServletConfig.class, TomCatWebServerConfig.class}) // static하게 App Infra Beans 등록
+public @interface EnableMyAutoConfiguration {
+}
+```
+
+TO-BE :
+- ImportSelector interface를 이용하여, 빈들을 동적으로 등록.
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Import(MyAutoConfigImportSelector.class) // ImportSelect로 선택한 빈들을 Import
+public @interface EnableMyAutoConfiguration {
+}
+
+public class MyAutoConfigImportSelector implements DeferredImportSelector  {
+
+    @Override
+    public String[] selectImports(AnnotationMetadata importingClassMetadata) {
+        return new String[] {
+            "withbeth.me.config.autoconfig.DispatcherServletConfig",
+            "withbeth.me.config.autoconfig.TomcatWebServerConfig"
+        };
+    }
+}
+```
 
 ### [ ] 자동구성정보 파일 분리
 
