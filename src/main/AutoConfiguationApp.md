@@ -111,7 +111,6 @@ Q. 스프링부트가 container-less 달성을 위해, 내장형 서블릿 컨�
 - A. **Appliction Infra Bean**이기에, `자동 구성정보(AutoConfiguration)`를 이용해 구성 정보가 만들어진다.
 
 Q. `자동 구성정보(AutoConfiguration)`는 어떻게 구성되어 있나?
-Simply put,
 - Application에서 사용될수 있는 각 인프라 빈들을 담은 `@Configuration` class들을 `각 기능별`로 구분하여 작성.
 - SpringBoot가 Application의 필요에 따라, 필요한 설정정보들을 골라 필요한 방식으로 구성하여 자동으로 적용.
 
@@ -127,7 +126,7 @@ What we did :
 ### [x] 동적인 자동구성정보 등록
 
 What we want to do :
-- 위에서 별도 어노테이션으로 분리한 **Application Infra Bean**을, `동적`으로 등록 하고 싶다.
+- 위에서 별도 어노테이션으로 분리한 **Application Infra Bean Config**을, `동적`으로 등록 하고 싶다.
 
 AS-IS :
 - 해당빈들을 @Import를 이용해 hardcoded & static하게 등록하고 있다.
@@ -160,9 +159,30 @@ public class MyAutoConfigImportSelector implements DeferredImportSelector  {
 }
 ```
 
-### [ ] 자동구성정보 파일 분리
+### [x] 자동구성정보 파일 분리
+
+What we want to do :
+- `ImportSelector`에 hardcoded된 App Infra Bean Config정보들을, 외부 설정 파일로 분리.
+- 이때, 단순히 텍스트파일에서 해당 설정 정보들을 String으로 읽어 오는 것이 아니라, 규격화 된 방법 이용.
+
+Task :
+- [x] `@MyAutoConfiguration` annotation 작성
+- [x] `MyAutoConfigImportSelector#selectImports()`에서, `ImportCandidates.load()` 이용해 App Infra Bean Config들을 읽어 오도록 수정.
+- [x] `ImportCandidates.load()`가 읽어 들이는 파일 작성
+- [x] 해당 파일에 App Infra Bean Config 정보 작성.
+
+Q. `ImportCandidates.load()`는 어디에 있는 파일을 읽어오나?
+- Format : 
+  - `META-INF/spring/full-qualified-annotation-name. imports` on the classpath. 
+  - Every line contains the full qualified name of the candidate class. 
+- Answer : 
+  - `main/resources/META-INF/spring/withbeth.me.config.MyAutoConfiguration.imports`
+
 
 ### [ ] 자동구성 어노테이션 적용
+
+Q. `@MyAutoConfiguration` annotation은, 단순히 외부 설정 파일을 읽어들이기 위한 placeholder역할인가?
+
 
 ### [ ] @Configuration and proxyBeanMethods
 
