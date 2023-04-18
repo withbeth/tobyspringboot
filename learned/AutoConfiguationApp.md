@@ -192,7 +192,7 @@ public class MyAutoConfigImportSelector implements DeferredImportSelector  {
 - -> 이를 통해, 해당 Config정보들은 해당 어노테이션에 의해 사용되는 대상이라는 것을 명시. (관례의 적용)
 
 - [x] `@MyAutoConfiguration`이 가지고 있는 `@Configuration`메타 어노테이션의 `proxyBeanMethods=false`적용.
-- -> #### Q. 이를 통해, 무엇을 하고 싶은거지? proxyBeanMethods는 해당 빈 메서드를 프록시를 거치게 만들어 라이프사이클을 바꾸는 애일텐데?
+- -> Q. 이를 통해, 무엇을 하고 싶은거지? proxyBeanMethods는 해당 빈 메서드를 프록시를 거치게 만들어 라이프사이클을 바꾸는 애일텐데?
 - -> 다음 챕터에서 `@Configuration`의 정확한 작동방식 설명.
 
 
@@ -222,19 +222,20 @@ public class DispatcherServletConfig {
 #### Result so far :
 ![IMG_86A99A7FC0DF-1.jpeg](..%2Fimage%2FIMG_86A99A7FC0DF-1.jpeg)
 
-
-
 #### Q. `@MyAutoConfiguration` annotation은, 단순히 외부 설정 파일을 읽어들이기 위한 placeholder역할인가?
+- A. YES
 
-
-### [ ] @Configuration and proxyBeanMethods
-
-#### Q. 왜 `@MyAutoConfiguration`이 가지고 있는 `@Configuration`메타 어노테이션의 `proxyBeanMethods=false`적용 하나요?
-
+### [x] @Configuration and proxyBeanMethods
 
 #### Q. `@Configuration`은 정확히 어떻게 동작하나요?
+- default behavior : `proxyBeanMethods=true`로 작동되어, 각 @Bean 등록 메서드를 프록시하여, Singleton Bean 라이프사이클 보장.
+- `proxyBeanMethods=false` : 프록시로 감싸는 것을 끌 수 있는 옵션 (Spring 5.2+)
 
+#### Q. 왜 `@MyAutoConfiguration`이 가지고 있는 `@Configuration`메타 어노테이션의 `proxyBeanMethods=false`적용 하나요?
+- 굳이 프록시를 만들 필요가 없는 경우, false로 설정해도 되기에.
+- 예전에는 official doc에서 굳이 프록시를 만들 필요가 없더라도 true로 설정하길 권장했지만,
+- 최근에는 굳이 프록시를 만들 필요가 없는 경우(`@Bean`등록메서드 안에서 또 다른 등록메서드를 호출하지 않아 의존하지 않는 경우)는 false로 설정해도 상관없다고 명시.
+- 예) `@EnableScheduling`의 경우 `proxyBeanMethods=false`로 설정.
 
-### Note
 
 
