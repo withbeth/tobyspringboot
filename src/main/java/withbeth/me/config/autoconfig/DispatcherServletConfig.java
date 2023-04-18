@@ -1,10 +1,10 @@
 package withbeth.me.config.autoconfig;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.DispatcherServlet;
+import withbeth.me.config.MyAutoConfiguration;
 
-@Configuration
+@MyAutoConfiguration
 public class DispatcherServletConfig {
     @Bean
     DispatcherServlet dispatcherServlet() {

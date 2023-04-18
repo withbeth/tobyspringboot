@@ -173,13 +173,56 @@ Task :
 
 Q. `ImportCandidates.load()`는 어디에 있는 파일을 읽어오나?
 - Format : 
-  - `META-INF/spring/full-qualified-annotation-name. imports` on the classpath. 
+  - `META-INF/spring/full-qualified-annotation-name.imports` on the classpath. 
   - Every line contains the full qualified name of the candidate class. 
 - Answer : 
   - `main/resources/META-INF/spring/withbeth.me.config.MyAutoConfiguration.imports`
 
 
-### [ ] 자동구성 어노테이션 적용
+### [x] 자동구성 어노테이션 적용
+
+What we did so far :
+
+- Import할 Application Infra Bean Config정보를, 외부 설정 파일로 분리.
+- 파일 이름 규칙에 특정 Annotation 이름 이용(`@MyAutoConfiguration`)
+
+What we wan to do :
+
+- [x] 이렇게 추가한 `@MyAutoConfiguration`을, Imports file에 의해 로딩 되는 Config정보에 부여 해야 한다.
+- -> 이를 통해, 해당 Config정보들은 해당 어노테이션에 의해 사용되는 대상이라는 것을 명시. (관례의 적용)
+
+- [x] `@MyAutoConfiguration`이 가지고 있는 `@Configuration`메타 어노테이션의 `proxyBeanMethods=false`적용.
+- -> Q. 이를 통해, 무엇을 하고 싶은거지? proxyBeanMethods는 해당 빈 메서드를 프록시를 거치게 만들어 라이프사이클을 바꾸는 애일텐데?
+- -> 다음 챕터에서 `@Configuration`의 정확한 작동방식 설명.
+
+
+AS-IS:
+```java
+@Configuration
+public class DispatcherServletConfig {
+    @Bean
+    DispatcherServlet dispatcherServlet() {
+        return new DispatcherServlet();
+    }
+}
+```
+
+TO-BE:
+```java
+@MyAutoConfiguration // Changed 
+public class DispatcherServletConfig {
+    @Bean
+    DispatcherServlet dispatcherServlet() {
+        return new DispatcherServlet();
+    }
+}
+```
+
+Result so far :
+
+![IMG_86A99A7FC0DF-1.jpeg](..%2F..%2Fimage%2FIMG_86A99A7FC0DF-1.jpeg)
+
+
 
 Q. `@MyAutoConfiguration` annotation은, 단순히 외부 설정 파일을 읽어들이기 위한 placeholder역할인가?
 
