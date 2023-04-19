@@ -7,7 +7,7 @@ import withbeth.me.config.MyAutoConfiguration;
 @MyAutoConfiguration
 public class DispatcherServletConfig {
     @Bean
-    DispatcherServlet dispatcherServlet() {
+    public DispatcherServlet dispatcherServlet() {
         return new DispatcherServlet();
     }
 }
