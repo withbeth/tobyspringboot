@@ -78,22 +78,99 @@ HTTP 클라이언트 및 서버를 지원하며, 비동기식 및 이벤트 기�
 
 어떻게 `Condition`을 구현할 것인가.
 
-## [ ] @Conditional LearningTest
+## [x] @Conditional LearningTest
+
+### What we want to do
+
+학습테스트를 통해, 어떻게 `Conditional`이 작동하는지 확인.
 
 ### @Conditional and Condition
 
 ![IMG_11B183ED2C1A-1.jpeg](..%2Fimage%2FIMG_11B183ED2C1A-1.jpeg)
 
-- @Conditional은, Config과 Bean에 Annotate가능.
-- `@Config` (Class lv) : 
-  - Condition이 true일경우, 
-    - Configuation 전체를 Bean으로 등록하며, 
-    - 포함하고 있는 모든 @Bean 팩토리 메서드들 실행하여 Bean으로 등록.
-- `@Bean` (Method lv) : 
-  - Condition이 true일경우,
-    - @Bean 팩토리 메서드를 실행하여 Bean으로 등록.
-- Note : 
-  - 애초에 Class lv(@Config)의 Condition이 false일경우, Method lv(@Bean)의 Condition은 체크하지 않는다.
+@Conditional은, Config과 Bean에 Annotate가능.
+
+`@Config` (Class lv) : if Condition == true, Configuation Bean등록 + 포함된 모든 @Bean 팩토리 메서드 실행하여 Bean 등록.
+
+`@Bean` (Method lv) : if Condition == true, @Bean 팩토리 메서드 실행하여 Bean등록.
+
+Note : 애초에 `@Config`의 Condition이 false일경우, `@Bean` Condition 체크 X.
+
+### `@Conditional`에 적용된 attribute 값을, `Condition`클래스에서 이용하는 방법
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Conditional(BooleanCondition.class)
+@interface BooleanConditional {
+    boolean value();
+}
+
+@Configuration
+@BooleanConditional(true) // Conditional 어노테이션의 value 설정
+static class ConfigWithTrueCondition {
+}
+
+static class BooleanCondition implements Condition {
+  @Override
+  public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+    // AnnotatedTypeMetadata 객체로부터, Conditional의 설정된 value값 획득
+    Map<String, Object> annotationAttributes = 
+            metadata.getAnnotationAttributes(BooleanConditional.class.getName());
+    if (annotationAttributes == null) {
+      return false;
+    }
+    try {
+      return (Boolean) annotationAttributes.get("value");
+    } catch (ClassCastException e) {
+      return false;
+    }
+  }
+}
+```
+
+
+
+### Tip : Test목적으로 만들어진 ApplicationContext
+
+매번 ApplicationContext만들고, bean register -> refersh -> getBean()하지 않아도 된다.
+
+테스트 목적으로 만들어진 `ApplicationContextRunner`이용하면,
+
+Assert libary와 조합하여 손쉽게 컨텍스트 assertion 가능.
+
+> Utility design to run an ApplicationContext and provide AssertJ style assertions. 
+
+```java
+class MyContextTests {
+  private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+    .withPropertyValues("spring.foo=bar")
+    .withUserConfiguration(MyConfiguration.class);
+
+  // Run method takes a ContextConsumer that can apply assertions to the context. 
+  // Upon completion, the context is automatically closed.
+  @Test
+  someTest() {
+    this.contextRunner.withPropertyValues("spring.foo=biz").run((context) -> {
+        assertThat(context).containsSingleBean(MyBean.class);
+        // other assertions
+    });
+  }
+
+  // If the application context fails to start the #run(ContextConsumer) method is called with a "failed" application context. 
+  // Calls to the context will throw an IllegalStateException and assertions that expect a running context will fail. 
+  // The getFailure() assertion can be used if further checks are required on the cause of the failure:
+  @Test
+  someTest() {
+    this.context.withPropertyValues("spring.foo=fails").run((loaded) -> {
+         assertThat(loaded).getFailure().hasCauseInstanceOf(BadPropertyException.class);
+        // other assertions
+    });
+  }
+}
+```
+
+
 
 ## [ ] Custom @Conditional 
 
