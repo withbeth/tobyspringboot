@@ -1,6 +1,6 @@
 # 조건부 자동구성
 
-## [x] 스타터와 Jetty 서버 구성 추가 
+## [x] Jetty 스타터와 자동구성정보 Config 클래스 추가 
 
 ### Goal 
 
@@ -33,7 +33,8 @@ Tomcat은, 자바의 ServletContainer기술을 구현한 구현라이브러리 �
 참고로 jetty는, [spring-boot-starter-jetty](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using.build-systems.starters)를 이용해야 한다.
 
 ### Q. Jetty?
-Jetty는 자바 기반 경량 웹 서버.
+
+자바 기반 경량 웹 서버.
 
 HTTP 클라이언트 및 서버를 지원하며, 비동기식 및 이벤트 기반 처리를 통해 높은 처리량과 낮은 지연 시간을 제공. 
 
@@ -54,9 +55,45 @@ HTTP 클라이언트 및 서버를 지원하며, 비동기식 및 이벤트 기�
 
 따라서, 특정 조건시, 특정 빈을 선택하도록 하는 프로세스를 구현해야 한다.
 
-## [ ] @Conditional and Condition 
+## [x] @Conditional and Condition 
+
+### What we want to do
+
+조건을 나타내는 `Condition` 클래스를 구현하고,
+해당 조건을 이용해 자동구성 Config Class Level에 `@Conditional`적용.
+
+`Condition`클래스의 `matches`결과 여부를 통해, 
+해당 자동설정 Config클래스의 적용 여부를 결정할수 있다.
+
+일단, DeepDive하지 말고, 간단히 움직이는 것을 테스트해보자.
+
+`JettyWebServerConfig`클래스의 `Condition`은 true를 반환하도록 하드코딩하자.
+
+### Task
+
+- [x] `TomcatWebServerConfig`클래스에 `@Conditional`과 Condition적용(match result = false)
+- [x] `JettyWebServerConfig`클래스에 `@Conditional`과 Condition적용(match result = true)
+
+### Remaining Task
+
+어떻게 `Condition`을 구현할 것인가.
 
 ## [ ] @Conditional LearningTest
+
+### @Conditional and Condition
+
+![IMG_11B183ED2C1A-1.jpeg](..%2Fimage%2FIMG_11B183ED2C1A-1.jpeg)
+
+- @Conditional은, Config과 Bean에 Annotate가능.
+- `@Config` (Class lv) : 
+  - Condition이 true일경우, 
+    - Configuation 전체를 Bean으로 등록하며, 
+    - 포함하고 있는 모든 @Bean 팩토리 메서드들 실행하여 Bean으로 등록.
+- `@Bean` (Method lv) : 
+  - Condition이 true일경우,
+    - @Bean 팩토리 메서드를 실행하여 Bean으로 등록.
+- Note : 
+  - 애초에 Class lv(@Config)의 Condition이 false일경우, Method lv(@Bean)의 Condition은 체크하지 않는다.
 
 ## [ ] Custom @Conditional 
 
