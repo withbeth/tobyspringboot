@@ -129,15 +129,13 @@ static class BooleanCondition implements Condition {
 }
 ```
 
-
-
 ### Tip : Test목적으로 만들어진 ApplicationContext
 
 매번 ApplicationContext만들고, bean register -> refersh -> getBean()하지 않아도 된다.
 
 테스트 목적으로 만들어진 `ApplicationContextRunner`이용하면,
 
-Assert libary와 조합하여 손쉽게 컨텍스트 assertion 가능.
+Assert library와 조합하여 손쉽게 컨텍스트 assertion 가능.
 
 > Utility design to run an ApplicationContext and provide AssertJ style assertions. 
 
@@ -170,9 +168,26 @@ class MyContextTests {
 }
 ```
 
-
-
 ## [ ] Custom @Conditional 
+
+### What we want to do 
+`@Conditional`과 `Condition`을 활용해, 조건에 따라 Tomcat or Jetty를 사용하고 싶다.
+
+### Q. 그렇다면, 무엇을 기준으로 할 것인가?
+
+자동구성에서 가장 대표적으로 쓰이는 방법은, `특정 라이브러리(특정 클래스)가 프로젝트에 포함되어 있는가` 이다.
+- 예: embedded Tomcat 라이브러리가 포함되어 있을 경우에는 Tomcat을 이용하는 방식.
+
+그렇다면, 
+- `org.apache.catalina.startup.Tomcat` 가 현 프로젝트에 포함된 경우, `TomcatServletWebServerFactory` 을 이용.
+- `org.eclipse.jetty.server.Server` 가 현 프로젝트에 포함된 경우, `JettyServletWebServerFactory`를 이용하도록 해보자.
+
+### Q. 그렇다면, 어떤 라이브러리(클래스)가 현재 프로젝트에 포함되어 있는지는 어떻게 알 수 있을까?
+
+`org.springframework.util.ClassUtils#isPresent()` 이용.
+- className : FQCN
+- classLoader : `ConditionalContext.getClassLoader()`
+
 
 ## [ ] 자동 구성 정보 대체하기 
 
