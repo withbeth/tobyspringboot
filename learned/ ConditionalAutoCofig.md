@@ -88,7 +88,7 @@ HTTP 클라이언트 및 서버를 지원하며, 비동기식 및 이벤트 기�
 
 ![IMG_11B183ED2C1A-1.jpeg](..%2Fimage%2FIMG_11B183ED2C1A-1.jpeg)
 
-@Conditional은, Config과 Bean에 Annotate가능.
+@Conditional은, @Config과 @Bean에 Annotate가능.
 
 `@Config` (Class lv) : if Condition == true, Configuation Bean등록 + 포함된 모든 @Bean 팩토리 메서드 실행하여 Bean 등록.
 
@@ -187,6 +187,55 @@ class MyContextTests {
 `org.springframework.util.ClassUtils#isPresent()` 이용.
 - className : FQCN
 - classLoader : `ConditionalContext.getClassLoader()`
+
+### What we did so far
+
+특정 라이브러리 추가시, 스프링부트가 지원하는 자동구성 Config class 중 해당 라이브러리와 관련된 것이 있으면,
+해당 구성정보들이 빈으로 등록되도록 설정하는 방식에 대해 알 수 있었다.
+
+> 즉, 스프링이 자동 구성정보는 미리 만들어 놓고, 개발자가 어떻게 라이브러리 구성을 하냐에 따라, 필요한 구성정보들이 자동으로 로딩.
+
+### Q. 이제 그럼 끝인가? 더이상 개선할 부분은 없나?
+
+`Conditional`관련 코드 부분 개선(추상화)이 가능할 것 같다.
+- Tomcat과 Jetty의 Condition부분이 상당부분 중복되어 있기에.
+
+스프링부트는, Config class에서 직접 `@Conditional`을 가지지 않고, 해당 어노테이션을 메타 어노테이션으로 가지는
+`@ConditionalXXX` custom 어노테이션을 이용한다.
+
+그리고, 해당 custom 어노테이션에서 조건에 해당 하는 값을 설정 가능토록 한다.
+
+```java
+@MyAutoConfiguration
+@ConditionalMyOnClass("org.apache.catalina.startup.Tomcat")
+public class TomcatWebServerConfig {
+  @Bean(name = "tomcatWebServerFactory")
+  public ServletWebServerFactory servletWebServerFactory() {
+    return new TomcatServletWebServerFactory();
+  }
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Conditional(MyOnClassCondition.class)
+public @interface ConditionalMyOnClass {
+  String value();
+}
+
+public class MyOnClassCondition implements Condition {
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        Map<String, Object> attrs = metadata.getAnnotationAttributes(
+            ConditionalMyOnClass.class.getName());
+        String value = (String) attrs.get("value");
+        return ClassUtils.isPresent(value, context.getClassLoader());
+    }
+}
+```
+
+### Diagram
+
+![IMG_3A65A3FCFC47-1.jpeg](..%2Fimage%2FIMG_3A65A3FCFC47-1.jpeg)
 
 
 ## [ ] 자동 구성 정보 대체하기 
