@@ -168,7 +168,7 @@ class MyContextTests {
 }
 ```
 
-## [ ] Custom @Conditional 
+## [x] Custom @Conditional 
 
 ### What we want to do 
 `@Conditional`과 `Condition`을 활용해, 조건에 따라 Tomcat or Jetty를 사용하고 싶다.
@@ -237,7 +237,70 @@ public class MyOnClassCondition implements Condition {
 
 ![IMG_3A65A3FCFC47-1.jpeg](..%2Fimage%2FIMG_3A65A3FCFC47-1.jpeg)
 
+## [x] 자동 구성 정보 대체하기 
 
-## [ ] 자동 구성 정보 대체하기 
+### What we did so far
+
+**SpringBoot에서 구성정보를 작성하는 방식은 크게 2가지로 나뉜다. (AppLogic, AppInfra)**
+
+- AppLogic을 담당하는 빈들은, 사용자 구성정보 방식을 통해 등록. (`@ComponentScan`)
+- AppInfra(특정 기술 구현등)을 담당하는 빈들은, 스프링 부트의 자동구성방식에 의해 자동으로 등록된다.(AutoConfiguration)
+
+
+**그렇다면 우리가 지금까지 작성한 AutoConfiguration이 전체 애플리케이션에서 어떻게 동작하는지 복습해보자.**
+
+![IMG_689AAEE4BE2D-1.jpeg](..%2Fimage%2FIMG_689AAEE4BE2D-1.jpeg)
+
+- `@MyAutoConfiguration`의 이름과 일치하는 imports 파일에, 빈 등록정보로 등록할 `후보` Configuration 파일 목록을 추가.
+- 해당 파일에 있는 모든 Configuration을 찾아서, 해당 설정을 이용해서 빈을 등록할 것인지를 결정.
+- 등록 여부는 각 후보들의 `@Conditional`을 보고 빈 등록 여부를 결정. (정확히는, `@Conditional`이 가지고 있는 `Condition`클래스의 `matches` 결과)
+- 스프링 부트는 이러한 체계를 만들어 놨을 뿐, 실제 수행은 스프링 프레임워크에 의해서 이루어진다.
+
+### What we want to do 
+
+**스프링부트가 제공하는 자동 구성을 대체 해서, 유저가 직접 해당 AppInfra 빈을 생성하기**
+
+![IMG_5B7B3F26FA72-1.jpeg](..%2Fimage%2FIMG_5B7B3F26FA72-1.jpeg)
+
+- 사용자 구성정보에, AppInfra 빈 정의.
+- 이럴 경우, 자동구성정보 빈을 무시하고 사용자 구성정보에 정의된 AppInfra 빈을 이용하게 하고 싶다.
+
+
+### Q. 어떻게 스프링부트 자동구성으로 등록된 AppInfraBean을, 사용자 구성정보의 빈으로 대체할 수 있나?
+
+A. Use `@Conditional` in `@Bean` factory method.
+- `Condition` : 자동구성정보로 등록하려는 빈 타입이, 존재하지 않을 경우에만 등록
+- 스프링부트가 제공하는 `@ConditionalOnMissingBean`이용.
+
+정리해보면,
+
+- Config class level Condition : 특정 클래스(라이브러리)가 현재 프로젝트에 포함되는 경우, 모든 `@Bean` 팩토리 메서드 실행.
+- Bean method level condition  : 등록하려는 빈 타입이, 존재하지 않을 경우에만 빈 등록.
+
+![IMG_E95C70FA240A-1.jpeg](..%2Fimage%2FIMG_E95C70FA240A-1.jpeg)
+
+### Q. 그렇다면, 사용자 구성정보가 자동구성정보보다 먼저 빈으로 등록되나?
+
+A. `DefferedImportSelector`구현체를 이용해 자동구성정보 등록하는 경우는 사용자 구성정보가 먼저 등록된다.
+- 우리가 만든 자동구성정보는 `DefferedImportSelector`의 구현체를 이용해 자동구성정보를 등록했다.
+- 해당 인터페이스를 이용한 이유는, 사용자 구성정보를 먼저 빈으로 등록하기 위해서.
+
+
+### Q. 그럼, 항상 사용자 구성정보를 이용해서 AppInfraBean을 대체해도 되나요?
+
+A. 특정 인프라 빈이, 어떤식으로 자동구성정보를 이용해 등록되는지를 모른채, <br>
+  무분별하게 인프라 빈을 사용자 구성정보로 등록하여 대체하도록 하면, <br>
+  앱이 시작도 안되거나, 도중에 Degradation이 발생할 수 있다. <br>
+
+특히, 한두개의 빈만 잘못 대체하게 되면, 예상치 못한 방식으로 인프라가 구성될 리스크가 있다.
+
+### Q. 그럼, 위 문제를 어떻게 피할 수 있을까? <br>
+A. Investigate IMPACT first.
+- 해당 인프라 빈을 대체했을시, **어떤 부분이 대체가 되고, 그것으로 인해 기본동작방식이 어떻게 변경되는지** 파악 필요.
+
 
 ## [ ] 스프링 부트의 @Conditional 
+
+### What we want to do 
+
+스프링 부트의 자동구성정보는 어떤식으로 구성되어 있나?
