@@ -99,10 +99,12 @@ public class HelloBootApplication {
   - **Application Logic bean**과, **Application Infra bean**으로 구분할수 있다.
   - **Application Logic Bean**의 구성 정보는, 사용자가 명시적으로  `ComponenScan`으로 구성정보 제공.
   - **Application Infra Bean**의 구성 정보는 `AutoConfiguration`을 이용해 **자동**으로 구성정보 제공.
+  - ![IMG_4E23A34055D5-1.jpeg](..%2Fimage%2FIMG_4E23A34055D5-1.jpeg)
 
 - **Container Infra bean** :
   - `ApplicationContext`, `BeanFactoryPostProcessor`,`BeanPostProcessor`, `DefaultAdvisorAutoProxyCreator`,...
   - 스프링 컨테이너 자신이거나, 컨테이너 내부에서 사용되거나, 특정 기술 구현을 위해 자동으로 등록한 빈.
+
 
 #### Q. 스프링부트가 container-less 달성을 위해, 내장형 서블릿 컨테이너를 이용하는 standalone방식으로 동작시키기 위해 이용하는 다음과 같은 빈들이 존재하는데, 이 빈들은 어떤 빈에 속하는 것일까?
 - `ServletWebServerFactory` bean
