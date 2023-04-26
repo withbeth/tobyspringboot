@@ -299,8 +299,77 @@ A. Investigate IMPACT first.
 - 해당 인프라 빈을 대체했을시, **어떤 부분이 대체가 되고, 그것으로 인해 기본동작방식이 어떻게 변경되는지** 파악 필요.
 
 
-## [ ] 스프링 부트의 @Conditional 
+## [x] 스프링 부트의 @Conditional 
 
 ### What we want to do 
 
 스프링 부트의 자동구성정보는 어떤식으로 구성되어 있나?
+
+### @Profile도 @Conditional이다!!
+```java
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Conditional(ProfileCondition.class)
+public @interface Profile {
+	/**
+	 * The set of profiles for which the annotated component should be registered.
+	 */
+    String[] value();
+}
+
+class ProfileCondition implements Condition {
+  @Override
+  public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+    MultiValueMap<String, Object> attrs = metadata.getAllAnnotationAttributes(Profile.class.getName());
+    if (attrs != null) {
+      for (Object value : attrs.get("value")) {
+        if (context.getEnvironment().acceptsProfiles(Profiles.of((String[]) value))) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+}
+```
+
+### Class Conditions
+포함 여부 조건 : 클래스의 프로젝트내 존재 여부
+- `@ConditionalOnClass`
+- `@ConditionalOnMissiingClass`
+
+### Bean Conditions
+포함 여부 조건 : 빈 존재 여부
+- `@ConditonalOnBean`
+- `@ConditonalOnMissingBean`
+
+주의점 : 
+컨테이너에 등록된 빈 정보를 기준 으로 체크하기에,  `@Configuration`클래스의 적용 순서가 중요.
+
+나중에 배우겠지만 적용 우선순위를 조절해 적용하는 방법이 있다.
+
+### Note : 자주 사용되는 Class & Bean Conditions 조합
+```
+@ConditionalOnClass // 클래스 존재 여부로 해당 기술 사용 여부 파악
+class SomeConfig  {
+  @ConditionalOnMissingBean // 유저가 정의한 커스텀 빈이 존재하지 않을 경우에는 자동 구성 빈 등록
+  MyBean mybean() {...}
+}
+```
+
+### Property Conditions
+포함여부 조건 : 지정된 프로퍼티가 존재하며 && 값이 not false 일경우
+- `@ConditionalOnProperty` : 스프링의 환경 프로퍼티 이용.
+
+**포함여부 프로퍼티 + 추가적인 프로퍼티 값**을 이용해 세밀하게 빈 구성 가능.
+
+### Resource Conditions
+포함여부 조건 : 지정된 리소스(파일) 존재 여부
+- `@ConditionalOnResource`
+
+### WebApplication Conditions
+- `@ConditionalOnWebApplication`
+- `@ConditionalOnNotWebApplication`
+
